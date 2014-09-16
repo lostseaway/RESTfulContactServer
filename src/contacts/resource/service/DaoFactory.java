@@ -1,7 +1,11 @@
 package contacts.resource.service;
 
+/**
+ * Factory of ContactsDAO
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class DaoFactory {
-	// singleton instance of this factory
 	private static DaoFactory factory;
 	private ContactsDAO daoInstance;
 	

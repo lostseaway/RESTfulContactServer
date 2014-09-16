@@ -3,63 +3,7 @@ package contacts.resource.service;
 import java.util.HashMap;
 
 
-//public class ContactsDAO {
-//	private HashMap<Long, Contact> contacts;
-//	private Long nextID;
-//	public ContactsDAO(){
-//		contacts = new HashMap<Long, Contact>();
-//		contacts.put(1L, new Contact("Test","test@abc.com"));
-//		nextID = 100L;
-//	}
-//	
-//	public Contact find(Long id){
-//		return contacts.get(id);
-//	}
-//	public Contact find(String id){
-//		return contacts.get(Long.parseLong(id));
-//	}
-//	
-//	
-//	public HashMap<Long, Contact> findAll(){
-//		return contacts;
-//	}
-//	
-//	public boolean delete(Long id){
-//		if(contacts.remove(id) != null) return true;
-//		return false;
-//	}
-//	
-//	public boolean save(Contact contact){
-//		if(Long.parseLong(contact.getId()) == 0){
-//			contact.setId(this.getUniqueId()+"");
-//			contacts.put(Long.parseLong(contact.getId()),contact );
-//			return true;
-//		}
-//		if(find(Long.parseLong(contact.getId()))==null){
-//			contacts.put(Long.parseLong(contact.getId()),contact );
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//	public boolean update(Contact update){
-//		Contact contact = find(Long.parseLong(update.getId()));
-//		if(contact != null){
-//			contact.applyUpdate(update);
-//			return true;
-//		}
-//		return false;
-//	}
-//	
-//	private synchronized long getUniqueId() {
-//		long id = nextID++;
-//		while(id < Long.MAX_VALUE){
-//			if(find(id)==null)return id;
-//			id = nextID++;
-//		}
-//		return id;
-//	}
-//}
+
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -71,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * dao = DaoFactory.getInstance().getContactDao()
  * 
  * @author jim
+ * @edit Thunyathon Jaruchotratanasakul 5510546972
  */
 public class ContactsDAO {
 	private List<Contact> contacts;
@@ -159,6 +104,11 @@ public class ContactsDAO {
 		return id; // this should never happen
 	}
 	
+	/**
+	 * Get Contact by checking subString 
+	 * @param s sub-Srting
+	 * @return
+	 */
 	public List<Contact> getByQuery(String s){
 		List<Contact> out = new ArrayList<Contact>();
 		String rex = ".*\\b"+s+"\\b.*";

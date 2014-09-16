@@ -6,6 +6,11 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * Contact class
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 @XmlRootElement(name="contact")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Contact {
@@ -51,6 +56,10 @@ public class Contact {
 		this.email = email;
 	}
 	
+	/**
+	 * update detail by resiving id.
+	 * @param contact
+	 */
 	public void applyUpdate(Contact contact){
 		this.name = contact.getName();
 		this.title = contact.getTitle();

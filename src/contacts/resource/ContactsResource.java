@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -27,6 +28,11 @@ import javax.xml.bind.JAXBElement;
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactsDAO;
 import contacts.resource.service.DaoFactory;
+/**
+ * ContactResource provides RESTful web resources using JAX-RS
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 @Path("/contacts")
 public class ContactsResource {
 	private Map<String, String> greetings = new HashMap<>();
@@ -38,6 +44,12 @@ public class ContactsResource {
 		
 		dao = DaoFactory.getInstance().getContactDao();
 	}
+	
+	/**
+	 * Get Contact by id 
+	 * @param id by url path
+	 * @return contact xml
+	 */
 	@GET
 	@Path("{id}")
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
@@ -45,6 +57,11 @@ public class ContactsResource {
 		return dao.find(Long.parseLong(id));
 	}
 
+	/**
+	 * Get Contact by QueryParam if no QueryParam it will return all contacts in list
+	 * @param q substring that you what to search in contact title
+	 * @return response with array of contacts
+	 */
 	@GET
 	@Produces("text/xml")
 	public Response getContects(@QueryParam("q") String q) {
@@ -68,20 +85,27 @@ public class ContactsResource {
 	
 	
 	/**
-	 * Put a greeting. JAX-RS automatically provides an InputStream
-	 * or Reader (!) to read the request body.
-	 * @param name name derived from path parameter
-	 * @param reader body of the request
+	 * Put contact to update value
+	 * @param element
+	 * @param id contact id
+	 * @return
+	 * @throws URISyntaxException
 	 */
 	@PUT
-	@Path("{name}")
-	public Response putGreeting(JAXBElement<Contact> element, @PathParam("id") String id) throws URISyntaxException {
+	@Path("{id}")
+	public Response updateContact(JAXBElement<Contact> element, @PathParam("id") String id) throws URISyntaxException {
 		Contact contact = element.getValue();
 		contact.setId(id);
 		dao.update(contact);
 		return Response.created(new URI("localhost:8080/contacts/"+id)).build();
 	}
 	
+	/**
+	 * Create new Contact by POST
+	 * @param element xml elements
+	 * @param uriInfo
+	 * @return
+	 */
 	@POST
 	@Consumes(MediaType.TEXT_XML ) 
 	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo )
@@ -94,6 +118,17 @@ public class ContactsResource {
 	            return Response.serverError().build();
 	            
 	            
+	}
+	
+	/**
+	 * Delete contact by id
+	 * @param id contact id
+	 */
+	@DELETE
+	@Path("{id}")
+	@Produces( MediaType.APPLICATION_XML )
+	public void deleteContact( @PathParam("id") String id) {
+		dao.delete(Long.parseLong(id));
 	}
 	
 }
