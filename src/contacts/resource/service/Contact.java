@@ -18,24 +18,15 @@ public class Contact {
 	private String phoneNumber;
 	
 	
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
+
 	protected Contact(){
-		this("","");
+		this("","","","");
 	}
-	public Contact(String name,String email){
+	public Contact(String title,String name,String email,String phone){
+		this.title = title;
 		this.name = name;
 		this.email = email;
+		this.phoneNumber = phone;
 		this.id = Long.toString(getNextId());
 	}
 	private long getNextId() {
@@ -65,5 +56,18 @@ public class Contact {
 		this.title = contact.getTitle();
 		this.email = contact.getEmail();
 		this.phoneNumber = contact.getPhoneNumber();
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 }
