@@ -1,4 +1,4 @@
-package contacts.resource.service;
+package contacts.resource.service.mem;
 
 import java.util.HashMap;
 
@@ -6,6 +6,9 @@ import java.util.HashMap;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
+import contacts.resource.service.Contact;
+import contacts.resource.service.ContactDao;
 
 
 /**
@@ -17,19 +20,17 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author jim
  * @edit Thunyathon Jaruchotratanasakul 5510546972
  */
-public class ContactsDAO {
+public class MemContactsDAO implements ContactDao {
 	private List<Contact> contacts;
 	private AtomicLong nextId;
 	
-	public ContactsDAO() {
+	public MemContactsDAO() {
 		contacts = new ArrayList<Contact>();
 		nextId = new AtomicLong(1000L);
+		this.save(new Contact("Title","Name","email@mail.com","0899999999"));
 	}
 	
-	/** Find a contact by ID in contacts.
-	 * @param the id of contact to find
-	 * @return the matching contact or null if the id is not found
-	 */
+	
 	public Contact find(long id) {
 		for(Contact c : contacts) 
 			if (Long.parseLong(c.getId()) == id) return c;
@@ -111,9 +112,9 @@ public class ContactsDAO {
 	 */
 	public List<Contact> getByQuery(String s){
 		List<Contact> out = new ArrayList<Contact>();
-		String rex = ".*\\b"+s+"\\b.*";
+//		String rex = ".*\\b"+s+"\\b.*";
 		for(int i =0;i<contacts.size();i++){
-			if(contacts.get(i).getTitle().matches(rex)) out.add(contacts.get(i));
+			if(contacts.get(i).getTitle().contains(s)) out.add(contacts.get(i));
 		}
 		return out;
 	}

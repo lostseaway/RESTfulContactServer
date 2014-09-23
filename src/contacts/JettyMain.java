@@ -8,9 +8,18 @@ import org.glassfish.jersey.server.ServerProperties;
 
 public class JettyMain {
 	static final int PORT = 8080;
-
+	static Server server;
 	public static void main(String[] args) throws Exception {
-		Server server = new Server( PORT );
+		
+		startServer(8080);
+		
+		System.out.println("Server started.  Press ENTER to stop it.");
+		int ch = System.in.read();
+		
+		
+	}
+	public static void startServer(int port) throws Exception{
+		server = new Server( PORT );
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
 //		context.setContextPath("/");
 		ServletHolder holder = new ServletHolder( org.glassfish.jersey.servlet.ServletContainer.class );
@@ -20,9 +29,9 @@ public class JettyMain {
 		
 		System.out.println("Starting Jetty server on port " + PORT);
 		server.start();
-		
-		System.out.println("Server started.  Press ENTER to stop it.");
-		int ch = System.in.read();
+	}
+	
+	public static void stopServer() throws Exception{
 		System.out.println("Stopping server.");
 		server.stop();
 	}

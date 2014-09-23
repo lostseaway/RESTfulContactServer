@@ -26,8 +26,9 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
 import contacts.resource.service.Contact;
-import contacts.resource.service.ContactsDAO;
+import contacts.resource.service.ContactDao;
 import contacts.resource.service.DaoFactory;
+import contacts.resource.service.mem.MemDaoFactory;
 /**
  * ContactResource provides RESTful web resources using JAX-RS
  * @author Thunyathon Jaruchotrattanasakul 55105469782
@@ -36,13 +37,13 @@ import contacts.resource.service.DaoFactory;
 @Path("/contacts")
 public class ContactsResource {
 	private Map<String, String> greetings = new HashMap<>();
-	private ContactsDAO dao;
+	private ContactDao dao;
 	@Context
 	UriInfo uriInfo;
 	
 	public ContactsResource() {
-		
 		dao = DaoFactory.getInstance().getContactDao();
+		System.out.println(dao);
 	}
 	
 	/**

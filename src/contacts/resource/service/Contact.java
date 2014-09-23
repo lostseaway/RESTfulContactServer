@@ -1,5 +1,9 @@
 package contacts.resource.service;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -13,8 +17,11 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name="contact")
 @XmlAccessorType(XmlAccessType.FIELD)
+@Entity
 public class Contact {
 	private static long nextId = 1_000_000_000L;
+	@Id
+	@GeneratedValue(strategy=GenerationType.AUTO)
 	@XmlAttribute
 	private String id;
 	private String title;

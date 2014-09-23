@@ -1,24 +1,16 @@
 package contacts.resource.service;
 
-/**
- * Factory of ContactsDAO
- * @author Thunyathon Jaruchotrattanasakul 55105469782
- *
- */
-public class DaoFactory {
+import contacts.resource.service.jpa.JpaDaoFactory;
+import contacts.resource.service.mem.MemDaoFactory;
+
+public abstract class DaoFactory {
 	private static DaoFactory factory;
-	private ContactsDAO daoInstance;
-	
-	private DaoFactory() {
-		daoInstance = new ContactsDAO();
+	protected DaoFactory(){
+		
 	}
-	
 	public static DaoFactory getInstance() {
-		if (factory == null) factory = new DaoFactory();
+		if (factory == null) factory = new JpaDaoFactory();
 		return factory;
 	}
-	
-	public ContactsDAO getContactDao() {
-		return daoInstance;
-	}
+	public abstract ContactDao getContactDao();
 }

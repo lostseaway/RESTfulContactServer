@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Sep 23 19:45:04 ICT 2014:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.1 - (1616546): instance a816c00e-0148-a28b-30cb-000000a47ab8 
+on database directory /private/tmp/contactdb with class loader sun.misc.Launcher$AppClassLoader@5f3c6654 
+Loaded from file:/Users/LostSeaWay/Documents/TA/eq/jimContact/contacts_ws/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.7.0_25-b15
+user.dir=/Users/LostSeaWay/Documents/TA/eq/RESTfulContactServer
+os.name=Mac OS X
+os.arch=x86_64
+os.version=10.9.2
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''
