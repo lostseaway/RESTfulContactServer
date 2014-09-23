@@ -1,5 +1,6 @@
 package contacts.resource.service.jpa;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -32,6 +33,20 @@ public class JpaDaoFactory extends DaoFactory
 	@Override
 	public ContactDao getContactDao() {
 		return dao;
+	}
+	@Override
+	public void shutdown() {
+		try {
+			if ( em != null && em.isOpen() ) {
+				em.close();
+			}
+			if ( emf != null && emf.isOpen() ) {
+				emf.close();
+			}
+		} catch ( IllegalStateException ex ) {
+			logger.log( Level.SEVERE, ex.toString() );
+		}
+		
 	}
 	
 

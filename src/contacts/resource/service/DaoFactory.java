@@ -13,4 +13,5 @@ public abstract class DaoFactory {
 		return factory;
 	}
 	public abstract ContactDao getContactDao();
+	public abstract void shutdown();
 }

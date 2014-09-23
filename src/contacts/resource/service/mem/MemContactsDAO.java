@@ -1,11 +1,16 @@
 package contacts.resource.service.mem;
 
+import java.io.File;
 import java.util.HashMap;
 
 
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactDao;
@@ -39,6 +44,21 @@ public class MemContactsDAO implements ContactDao {
 
 	public List<Contact> findAll() {
 		return java.util.Collections.unmodifiableList(contacts);
+	}
+	
+	private void loadContacts() {
+		try {
+			Contacts importContacts = new Contacts();
+			JAXBContext context = JAXBContext.newInstance( Contacts.class ) ;
+			File inputFile = new File("tmp/ContactPersistant.xml" );
+			Unmarshaller unmarshaller = context.createUnmarshaller();	
+			importContacts = (Contacts) unmarshaller.unmarshal( inputFile );
+			for ( Contact contact : importContacts.getContacts() ) {
+				contacts.add(contact);
+			}
+		} catch ( JAXBException e ) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

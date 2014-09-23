@@ -1,5 +1,13 @@
 package contacts.resource.service.mem;
 
+import java.io.File;
+import java.util.List;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import contacts.resource.service.Contact;
 import contacts.resource.service.DaoFactory;
 
 /**
@@ -22,5 +30,22 @@ public class MemDaoFactory extends DaoFactory {
 	
 	public MemContactsDAO getContactDao() {
 		return daoInstance;
+	}
+
+	@Override
+	public void shutdown() {
+		List<Contact> contacts = daoInstance.findAll();
+		Contacts exportContacts = new Contacts();
+		exportContacts.setContacts( contacts );
+
+		try {
+			JAXBContext context = JAXBContext.newInstance( Contacts.class );
+			File outputFile = new File( "tmp/ContactPersistant.xml" );
+			Marshaller marshaller = context.createMarshaller();	
+			marshaller.marshal( exportContacts, outputFile );
+		} catch ( JAXBException e ) {
+			e.printStackTrace();
+		}
+		
 	}
 }
