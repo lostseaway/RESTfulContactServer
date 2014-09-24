@@ -9,7 +9,7 @@ public abstract class DaoFactory {
 		
 	}
 	public static DaoFactory getInstance() {
-		if (factory == null) factory = new JpaDaoFactory();
+		if (factory == null) factory = new MemDaoFactory();
 		return factory;
 	}
 	public abstract ContactDao getContactDao();

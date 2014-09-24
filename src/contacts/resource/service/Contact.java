@@ -31,7 +31,7 @@ public class Contact {
 	
 	
 
-	protected Contact(){
+	public Contact(){
 		this("","","","");
 	}
 	public Contact(String title,String name,String email,String phone){

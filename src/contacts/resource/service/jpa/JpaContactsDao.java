@@ -17,7 +17,6 @@ public class JpaContactsDao implements ContactDao {
 	UriInfo uriInfo;
 	public JpaContactsDao(EntityManager em) {
 		this.em = em;
-		this.save(new Contact("Title","Name","email@mail.com","0899999999"));
 	}
 	@Override
 	public Contact find(long id) {
@@ -44,6 +43,8 @@ public class JpaContactsDao implements ContactDao {
 	@Override
 	public boolean save(Contact contact) {
 		if (contact == null) throw new IllegalArgumentException("NULL contact");
+		Contact con = em.find(Contact.class,contact.getId());
+		if(con!=null)return false;
 		EntityTransaction et = em.getTransaction();
 		et.begin();
 		em.persist(contact);

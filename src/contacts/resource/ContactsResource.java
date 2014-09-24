@@ -94,6 +94,7 @@ public class ContactsResource {
 	 */
 	@PUT
 	@Path("{id}")
+	@Consumes(MediaType.TEXT_XML )
 	public Response updateContact(JAXBElement<Contact> element, @PathParam("id") String id) throws URISyntaxException {
 		Contact contact = element.getValue();
 		contact.setId(id);
@@ -128,8 +129,9 @@ public class ContactsResource {
 	@DELETE
 	@Path("{id}")
 	@Produces( MediaType.APPLICATION_XML )
-	public void deleteContact( @PathParam("id") String id) {
-		dao.delete(Long.parseLong(id));
+	public Response deleteContact( @PathParam("id") String id) {
+		if(dao.delete(Long.parseLong(id)))return Response.ok().build();
+		return Response.notModified().build();
 	}
 	
 }

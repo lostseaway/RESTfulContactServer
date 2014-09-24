@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import contacts.resource.service.Contact;
@@ -32,7 +33,8 @@ public class MemContactsDAO implements ContactDao {
 	public MemContactsDAO() {
 		contacts = new ArrayList<Contact>();
 		nextId = new AtomicLong(1000L);
-		this.save(new Contact("Title","Name","email@mail.com","0899999999"));
+//		this.save(new Contact("Title","Name","email@mail.com","0899999999"));
+		this.loadContacts();
 	}
 	
 	
@@ -50,11 +52,19 @@ public class MemContactsDAO implements ContactDao {
 		try {
 			Contacts importContacts = new Contacts();
 			JAXBContext context = JAXBContext.newInstance( Contacts.class ) ;
-			File inputFile = new File("tmp/ContactPersistant.xml" );
-			Unmarshaller unmarshaller = context.createUnmarshaller();	
-			importContacts = (Contacts) unmarshaller.unmarshal( inputFile );
-			for ( Contact contact : importContacts.getContacts() ) {
-				contacts.add(contact);
+			File inputFile = new File("ContactPersistant.xml" );
+			if(!inputFile.exists()){
+				System.out.println("eiei");
+				Marshaller marshaller = context.createMarshaller();	
+				marshaller.marshal( new Contacts(), inputFile );
+			}
+			else{
+				Unmarshaller unmarshaller = context.createUnmarshaller();	
+				importContacts = (Contacts) unmarshaller.unmarshal( inputFile );
+				if(importContacts.getContacts() == null)return;
+				for ( Contact contact : importContacts.getContacts() ) {
+					contacts.add(contact);
+				}
 			}
 		} catch ( JAXBException e ) {
 			e.printStackTrace();

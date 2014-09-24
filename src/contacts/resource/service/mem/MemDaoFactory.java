@@ -1,6 +1,7 @@
 package contacts.resource.service.mem;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -40,7 +41,8 @@ public class MemDaoFactory extends DaoFactory {
 
 		try {
 			JAXBContext context = JAXBContext.newInstance( Contacts.class );
-			File outputFile = new File( "tmp/ContactPersistant.xml" );
+			
+			File outputFile = new File( "ContactPersistant.xml" );
 			Marshaller marshaller = context.createMarshaller();	
 			marshaller.marshal( exportContacts, outputFile );
 		} catch ( JAXBException e ) {

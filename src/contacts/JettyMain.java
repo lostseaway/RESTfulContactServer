@@ -6,6 +6,8 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
+import contacts.resource.service.DaoFactory;
+
 public class JettyMain {
 	static final int PORT = 8080;
 	static Server server;
@@ -16,7 +18,12 @@ public class JettyMain {
 		System.out.println("Server started.  Press ENTER to stop it.");
 		int ch = System.in.read();
 		
+		System.out.println("Stopping server.");
+		DaoFactory dao = DaoFactory.getInstance();
+		dao.shutdown();
 		
+		System.out.println("Files written");
+		stopServer();
 	}
 	public static void startServer(int port) throws Exception{
 		server = new Server( PORT );
