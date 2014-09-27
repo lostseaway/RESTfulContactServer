@@ -11,6 +11,11 @@ import javax.ws.rs.core.UriInfo;
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactDao;
 
+/**
+ * The Contacts DAO that use JPA
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class JpaContactsDao implements ContactDao {
 	private final EntityManager em;
 	@Context

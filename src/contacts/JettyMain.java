@@ -8,6 +8,11 @@ import org.glassfish.jersey.server.ServerProperties;
 
 import contacts.resource.service.DaoFactory;
 
+/**
+ * Main class of Server
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class JettyMain {
 	static final int PORT = 8080;
 	static Server server;
@@ -25,6 +30,12 @@ public class JettyMain {
 		System.out.println("Files written");
 		stopServer();
 	}
+	
+	/**
+	 * Starting Webserver 
+	 * @param port starting port
+	 * @throws Exception
+	 */
 	public static void startServer(int port) throws Exception{
 		server = new Server( PORT );
 		ServletContextHandler context = new ServletContextHandler( ServletContextHandler.SESSIONS );
@@ -38,6 +49,10 @@ public class JettyMain {
 		server.start();
 	}
 	
+	/**
+	 * Shuting Server
+	 * @throws Exception
+	 */
 	public static void stopServer() throws Exception{
 		System.out.println("Stopping server.");
 		server.stop();

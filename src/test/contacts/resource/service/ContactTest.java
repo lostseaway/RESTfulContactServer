@@ -25,6 +25,11 @@ import org.junit.Test;
 import contacts.JettyMain;
 import contacts.resource.service.Contact;
 
+/**
+ * Junite Test For Contact DAO
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class ContactTest {
 	static int PORT = 8080;
 	Server server;
@@ -32,6 +37,7 @@ public class ContactTest {
 	HttpClient client = new HttpClient();
 	String xmlHeaderS = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><contacts><contact id=\"1000000000\"><title>Title</title><name>Name</name><email>email@mail.com</email><phoneNumber>0899999999</phoneNumber></contact>";
 	String xmlHeaderE = "</contacts>";
+	
 	@Before
 	public void beforeTest() throws Exception{
 		//Start Jetty
@@ -44,6 +50,11 @@ public class ContactTest {
 		//Setup URL
 		url = "http://localhost:8080/contacts/";
 	}
+	/**
+	 * UnMarshalling method for changing byte array -> contact class
+	 * @param byteArray
+	 * @return contact
+	 */
 	private Contact unMarshall( byte[] byteArray ) {
 		InputStream bodyStream = new ByteArrayInputStream( byteArray );
 		try {
@@ -67,12 +78,20 @@ public class ContactTest {
 		client.stop();
 	}
 	
+	/**
+	 * Test Normal Get Request
+	 * @throws Exception
+	 */
 	@Test
 	public void testGet1() throws Exception {
 		ContentResponse r = client.GET(url);
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 	}
 	
+	/**
+	 * Test bad url Get Request
+	 * @throws Exception
+	 */
 	@Test
 	public void testGet2() throws Exception {
 		ContentResponse r = client.GET(url+100000003);
@@ -80,6 +99,10 @@ public class ContactTest {
 		assertEquals(200, r.getStatus());
 	}
 	
+	/**
+	 * Test Success Post Request
+	 * @throws Exception
+	 */
 	@Test
 	public void testPost1() throws Exception {
 		StringContentProvider contact = new StringContentProvider("<contact id=\"999\">" +
@@ -96,6 +119,12 @@ public class ContactTest {
 		r = req.send();
 	}
 	
+	/**
+	 * Test Post and Checking content inside
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	@Test
 	public void testPost2() throws InterruptedException, TimeoutException, ExecutionException{
 		StringContentProvider contact = new StringContentProvider("<contact id=\"999\">" +
@@ -121,6 +150,12 @@ public class ContactTest {
 		
 	}
 	
+	/**
+	 * Test success PUT Request
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	@Test
 	public void testPut1() throws InterruptedException, TimeoutException, ExecutionException{
 		StringContentProvider contact = new StringContentProvider("<contact id=\"999\">" +
@@ -153,6 +188,12 @@ public class ContactTest {
 		
 	}
 	
+	/**
+	 * Test PUT Request and checking content inside
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	@Test
 	public void TestPut() throws InterruptedException, TimeoutException, ExecutionException{
 		StringContentProvider contact = new StringContentProvider("<contact id=\"999\">" +
@@ -186,6 +227,12 @@ public class ContactTest {
 		r = req.send();
 	}
 	
+	/**
+	 * Test success DELETE Request
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	@Test
 	public void TestDelete1() throws InterruptedException, TimeoutException, ExecutionException{
 		StringContentProvider contact = new StringContentProvider("<contact id=\"999\">" +
@@ -202,6 +249,12 @@ public class ContactTest {
 		assertEquals(Status.NO_CONTENT.getStatusCode(),r.getStatus());
 	}
 	
+	/**
+	 * Test Unsuccess DELETE Request
+	 * @throws InterruptedException
+	 * @throws TimeoutException
+	 * @throws ExecutionException
+	 */
 	@Test
 	public void TestDelete2() throws InterruptedException, TimeoutException, ExecutionException{
 		ContentResponse r = client.newRequest(url+999).method(HttpMethod.DELETE).send();

@@ -11,6 +11,11 @@ import javax.persistence.Persistence;
 import contacts.resource.service.ContactDao;
 import contacts.resource.service.DaoFactory;
 
+/**
+ * DAO Factory
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class JpaDaoFactory extends DaoFactory
 {	
 	private static final String PERSISTENCE_UNIT = "contacts";

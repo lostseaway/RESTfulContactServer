@@ -2,6 +2,11 @@ package contacts.resource.service;
 
 import java.util.List;
 
+/**
+ * ContactDao interface
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public interface ContactDao {
 	
 	/** Find a contact by ID in contacts.
