@@ -32,12 +32,15 @@ import javax.xml.bind.JAXBElement;
 
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactDao;
+import contacts.resource.service.Contacts;
 import contacts.resource.service.DaoFactory;
 import contacts.resource.service.mem.MemDaoFactory;
+
 /**
  * ContactResource provides RESTful web resources using JAX-RS
+ * 
  * @author Thunyathon Jaruchotrattanasakul 55105469782
- *
+ * 
  */
 @Path("/contacts")
 public class ContactsResource {
@@ -45,137 +48,172 @@ public class ContactsResource {
 	private ContactDao dao;
 	@Context
 	UriInfo uriInfo;
-	
+
 	public ContactsResource() {
 		dao = DaoFactory.getInstance().getContactDao();
 		System.out.println(dao);
 	}
-	
+
 	/**
-	 * Get Contact by id 
-	 * @param id by url path
+	 * Get Contact by id
+	 * 
+	 * @param id
+	 *            by url path
 	 * @return contact xml
 	 */
 	@GET
 	@Path("{id}")
 	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-	public Contact getContactID( @PathParam("id")String id ) {
-		return dao.find(Long.parseLong(id));
+	public Response getContactID(@PathParam("id") String id,
+			@HeaderParam("If-Match") String ifMatch,
+			@HeaderParam("If-None-Match") String ifNoneMatch,
+			@QueryParam("title") String title, @Context Request request) {
+		
+		Contact contact = dao.find(Long.parseLong(id));
+		Response response = checkMatch(ifMatch, ifNoneMatch,
+				Integer.toString(contact.hashCode()), true);
+		if(response!=null){
+			return response;
+		}
+		
+		CacheControl cc = new CacheControl();
+		cc.setMaxAge(-1);
+		cc.setPrivate(true);
+		EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
+
+		return Response.ok(contact).cacheControl(cc).tag(etag).build();
 	}
 
 	/**
-	 * Get Contact by QueryParam if no QueryParam it will return all contacts in list
-	 * @param q substring that you what to search in contact title
+	 * Get Contact by QueryParam if no QueryParam it will return all contacts in
+	 * list
+	 * 
+	 * @param q
+	 *            substring that you what to search in contact title
 	 * @return response with array of contacts
 	 */
 	@GET
 	@Produces("text/xml")
-	public Response getContects(@HeaderParam("If-Match") String ifMatch, @HeaderParam("If-None-Match") String ifNoneMatch, @QueryParam("title") String title, @Context Request request ,@QueryParam("q") String q) {
-		
-		List<Contact> arr;
-		GenericEntity<List<Contact>> out;
-//		if(q==null){
-			arr = dao.findAll();
-			out = new GenericEntity<List<Contact>>(arr) {};
-			Response response = checkPrecondition(ifMatch, ifNoneMatch, Integer.toString(out.hashCode()), false );
-			
-			if(response!=null){
-				return response;
-			}
-			CacheControl cc = new CacheControl();
-	        cc.setMaxAge(86400);
-	        cc.setPrivate(true);
-			EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
+	public Response getContects(@HeaderParam("If-Match") String ifMatch,
+			@HeaderParam("If-None-Match") String ifNoneMatch,
+			@QueryParam("title") String title, @Context Request request,
+			@QueryParam("q") String q) {
 
-			return Response.ok(out).cacheControl( cc ).tag( etag ).build();
-//		}
-//		else{
-//			arr = dao.getByQuery(q);
-//			
-//			if(arr!=null){
-//				out = new GenericEntity<List<Contact>>(arr) {};
-//				return Response.ok(out).build();
-//			}
-//			return Response.noContent().build();
-//		}
-			
-	}
-	
-	
-	private Response checkPrecondition(String ifMatch, String ifNoneMatch,
-			String string, boolean b) {
-		// TODO Auto-generated method stub
-		return null;
+		// List<Contact> arr;
+		// GenericEntity<List<Contact>> out;
+		// if(q==null){
+		Contacts out = dao.findAll();
+		Response response = checkMatch(ifMatch, ifNoneMatch,
+				Integer.toString(out.hashCode()), true);
+
+		if (response != null) {
+			return response;
+		}
+		CacheControl cc = new CacheControl();
+		cc.setMaxAge(-1);
+		cc.setPrivate(true);
+		EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
+
+		return Response.ok(out).cacheControl(cc).tag(etag).build();
+		// }
+		// else{
+		// arr = dao.getByQuery(q);
+		//
+		// if(arr!=null){
+		// out = new GenericEntity<List<Contact>>(arr) {};
+		// return Response.ok(out).build();
+		// }
+		// return Response.noContent().build();
+		// }
+
 	}
 
 	/**
 	 * Put contact to update value
+	 * 
 	 * @param element
-	 * @param id contact id
+	 * @param id
+	 *            contact id
 	 * @return
 	 * @throws URISyntaxException
 	 */
 	@PUT
 	@Path("{id}")
-	@Consumes(MediaType.TEXT_XML )
-	public Response updateContact(JAXBElement<Contact> element, @PathParam("id") String id) throws URISyntaxException {
+	@Consumes(MediaType.TEXT_XML)
+	public Response updateContact(JAXBElement<Contact> element,
+			@PathParam("id") String id) throws URISyntaxException {
 		Contact contact = element.getValue();
 		contact.setId(id);
 		dao.update(contact);
-		return Response.created(new URI("localhost:8080/contacts/"+id)).build();
+		return Response.created(new URI("localhost:8080/contacts/" + id))
+				.build();
 	}
-	
+
 	/**
 	 * Create new Contact by POST
-	 * @param element xml elements
+	 * 
+	 * @param element
+	 *            xml elements
 	 * @param uriInfo
 	 * @return
 	 */
 	@POST
-	@Consumes(MediaType.TEXT_XML ) 
-	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo )
-	      {
-	            Contact contact = element.getValue();
-	            if(dao.save(contact)){
-	            	URI uri = uriInfo.getAbsolutePath();
-	            	return Response.created(uri).build();	
-	            }
-	            return Response.serverError().build();
-	            
-	            
+	@Consumes({ MediaType.APPLICATION_XML })
+	@Produces({ MediaType.APPLICATION_XML })
+	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo) {
+		Contact contact = element.getValue();
+		if (dao.save(contact)) {
+			URI uri = uriInfo.getAbsolutePath();
+			return Response.created(uri).build();
+		}
+		return Response.serverError().build();
+
 	}
-	
+
 	/**
 	 * Delete contact by id
-	 * @param id contact id
+	 * 
+	 * @param id
+	 *            contact id
 	 */
 	@DELETE
 	@Path("{id}")
-	@Produces( MediaType.APPLICATION_XML )
-	public Response deleteContact( @PathParam("id") String id) {
-		if(dao.delete(Long.parseLong(id)))return Response.ok().build();
+	@Produces(MediaType.APPLICATION_XML)
+	public Response deleteContact(@PathParam("id") String id) {
+		if (dao.delete(Long.parseLong(id)))
+			return Response.ok().build();
 		return Response.notModified().build();
 	}
-	
-	private Response checkMatch( String ifMatch, String ifNoneMatch, String etag, boolean isGetMethod ){
-		if ( ifMatch != null && ifNoneMatch != null ) {
-			return Response.status( Response.Status.BAD_REQUEST ).build();
+
+	private Response checkMatch(String ifMatch, String ifNoneMatch,
+			String etag, boolean isGetMethod) {
+		System.out.println("IF-Match " + ifMatch + " , IF-None-Match "
+				+ ifNoneMatch + " , etag " + etag);
+
+		if (ifMatch != null && ifNoneMatch != null) {
+			return Response.status(Response.Status.BAD_REQUEST).build();
 		}
 
-		if ( ifMatch != null ) {
-			if ( ifMatch.equals( etag ) ) {				
+		if (ifMatch != null) {
+			ifMatch = ifMatch.replace("\"", "");
+
+			if (ifMatch.equals(etag)) {
 				return null;
 			} else {
-				return Response.status( Response.Status.PRECONDITION_FAILED ).build();
+				return Response.status(Response.Status.PRECONDITION_FAILED)
+						.build();
 			}
 		}
 
-		if ( ifNoneMatch != null ) {
-			if ( ifNoneMatch.equals( etag ) ) {
-				if ( isGetMethod ) {
-					return Response.status( Response.Status.NOT_MODIFIED ).build();
-				} else {					
-					return Response.status( Response.Status.PRECONDITION_FAILED ).build();
+		if (ifNoneMatch != null) {
+			ifNoneMatch = ifNoneMatch.replace("\"", "");
+			if (ifNoneMatch.equals(etag)) {
+				if (isGetMethod) {
+					return Response.status(Response.Status.NOT_MODIFIED)
+							.build();
+				} else {
+					return Response.status(Response.Status.PRECONDITION_FAILED)
+							.build();
 				}
 			} else {
 				return null;
@@ -183,5 +221,4 @@ public class ContactsResource {
 		}
 		return null;
 	}
-	
 }

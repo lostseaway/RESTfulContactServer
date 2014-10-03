@@ -15,6 +15,7 @@ import javax.xml.bind.Unmarshaller;
 
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactDao;
+import contacts.resource.service.Contacts;
 
 
 /**
@@ -44,8 +45,10 @@ public class MemContactsDAO implements ContactDao {
 		return null;
 	}
 
-	public List<Contact> findAll() {
-		return java.util.Collections.unmodifiableList(contacts);
+	public Contacts findAll() {
+		Contacts contacts = new Contacts();
+		contacts.setContacts(this.contacts);
+		return contacts;
 	}
 	
 	private void loadContacts() {

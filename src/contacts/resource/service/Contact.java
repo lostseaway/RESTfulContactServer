@@ -86,4 +86,8 @@ public class Contact {
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
+	public int hashCode(){
+		String out = this.name + this.title + this.email + this.phoneNumber;
+		return out.hashCode();
+	}
 }

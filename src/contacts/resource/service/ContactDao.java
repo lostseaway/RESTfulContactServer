@@ -16,7 +16,7 @@ public interface ContactDao {
 	public Contact find(long id) ;
 	
 	
-	public List<Contact> findAll();
+	public Contacts findAll();
 	
 	/**
 	 * Delete a saved contact.

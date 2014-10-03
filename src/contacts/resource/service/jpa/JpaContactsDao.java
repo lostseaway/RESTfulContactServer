@@ -10,6 +10,7 @@ import javax.ws.rs.core.UriInfo;
 
 import contacts.resource.service.Contact;
 import contacts.resource.service.ContactDao;
+import contacts.resource.service.Contacts;
 
 /**
  * The Contacts DAO that use JPA
@@ -29,10 +30,12 @@ public class JpaContactsDao implements ContactDao {
 	}
 
 	@Override
-	public List<Contact> findAll() {
+	public Contacts findAll() {
 		Query query = em.createQuery("SELECT a FROM Contact a");
 		List<Contact> list = query.getResultList();
-		return list;
+		Contacts contacts = new Contacts();
+		contacts.setContacts(list);
+		return contacts;
 	}
 
 	@Override

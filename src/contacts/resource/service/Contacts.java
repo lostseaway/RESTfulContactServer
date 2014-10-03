@@ -1,4 +1,4 @@
-package contacts.resource.service.mem;
+package contacts.resource.service;
 
 import java.util.List;
 
@@ -7,7 +7,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import contacts.resource.service.Contact;
 
 
 /**
@@ -30,6 +29,14 @@ public class Contacts {
 
 	public void setContacts( List<Contact> contacts ) {
 		this.contacts = contacts;
+	}
+	
+	public int hashCode(){
+		int out = 0;
+		for(int i =0 ;i<contacts.size();i++){
+			out += contacts.hashCode();
+		}
+		return out;
 	}
 	
 }

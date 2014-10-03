@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import contacts.resource.service.Contact;
+import contacts.resource.service.Contacts;
 import contacts.resource.service.DaoFactory;
 
 /**
@@ -35,7 +36,7 @@ public class MemDaoFactory extends DaoFactory {
 
 	@Override
 	public void shutdown() {
-		List<Contact> contacts = daoInstance.findAll();
+		List<Contact> contacts = daoInstance.findAll().getContacts();
 		Contacts exportContacts = new Contacts();
 		exportContacts.setContacts( contacts );
 
