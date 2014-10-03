@@ -12,16 +12,21 @@ import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 
@@ -65,26 +70,44 @@ public class ContactsResource {
 	 */
 	@GET
 	@Produces("text/xml")
-	public Response getContects(@QueryParam("q") String q) {
+	public Response getContects(@HeaderParam("If-Match") String ifMatch, @HeaderParam("If-None-Match") String ifNoneMatch, @QueryParam("title") String title, @Context Request request ,@QueryParam("q") String q) {
+		
 		List<Contact> arr;
 		GenericEntity<List<Contact>> out;
-		if(q==null){
+//		if(q==null){
 			arr = dao.findAll();
 			out = new GenericEntity<List<Contact>>(arr) {};
-			return Response.ok(out).build();
-		}
-		else{
-			arr = dao.getByQuery(q);
-			if(arr!=null){
-				out = new GenericEntity<List<Contact>>(arr) {};
-				return Response.ok(out).build();
+			Response response = checkPrecondition(ifMatch, ifNoneMatch, Integer.toString(out.hashCode()), false );
+			
+			if(response!=null){
+				return response;
 			}
-			return Response.noContent().build();
-		}
+			CacheControl cc = new CacheControl();
+	        cc.setMaxAge(86400);
+	        cc.setPrivate(true);
+			EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
+
+			return Response.ok(out).cacheControl( cc ).tag( etag ).build();
+//		}
+//		else{
+//			arr = dao.getByQuery(q);
+//			
+//			if(arr!=null){
+//				out = new GenericEntity<List<Contact>>(arr) {};
+//				return Response.ok(out).build();
+//			}
+//			return Response.noContent().build();
+//		}
 			
 	}
 	
 	
+	private Response checkPrecondition(String ifMatch, String ifNoneMatch,
+			String string, boolean b) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	/**
 	 * Put contact to update value
 	 * @param element
@@ -132,6 +155,33 @@ public class ContactsResource {
 	public Response deleteContact( @PathParam("id") String id) {
 		if(dao.delete(Long.parseLong(id)))return Response.ok().build();
 		return Response.notModified().build();
+	}
+	
+	private Response checkMatch( String ifMatch, String ifNoneMatch, String etag, boolean isGetMethod ){
+		if ( ifMatch != null && ifNoneMatch != null ) {
+			return Response.status( Response.Status.BAD_REQUEST ).build();
+		}
+
+		if ( ifMatch != null ) {
+			if ( ifMatch.equals( etag ) ) {				
+				return null;
+			} else {
+				return Response.status( Response.Status.PRECONDITION_FAILED ).build();
+			}
+		}
+
+		if ( ifNoneMatch != null ) {
+			if ( ifNoneMatch.equals( etag ) ) {
+				if ( isGetMethod ) {
+					return Response.status( Response.Status.NOT_MODIFIED ).build();
+				} else {					
+					return Response.status( Response.Status.PRECONDITION_FAILED ).build();
+				}
+			} else {
+				return null;
+			}
+		}
+		return null;
 	}
 	
 }
