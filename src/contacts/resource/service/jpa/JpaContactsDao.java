@@ -79,11 +79,14 @@ public class JpaContactsDao implements ContactDao {
 	}
 
 	@Override
-	public List<Contact> getByQuery(String s) {
+	public Contacts getByQuery(String s) {
 		Query query = em.createQuery("SELECT c FROM Contacts c WHERE LOWER(c.title) LIKE :title");
 		query.setParameter("title", "%"+s.toLowerCase()+"%");
 		List<Contact> list = query.getResultList();
-		return list;
+		if(list.size() == 0)return null;
+		Contacts contacts = new Contacts();
+		contacts.setContacts(list);
+		return contacts;
 	}
 
 }

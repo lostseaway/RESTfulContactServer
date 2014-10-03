@@ -50,5 +50,5 @@ public interface ContactDao {
 	 * @param s sub-Srting
 	 * @return
 	 */
-	public List<Contact> getByQuery(String s);
+	public Contacts getByQuery(String s);
 }

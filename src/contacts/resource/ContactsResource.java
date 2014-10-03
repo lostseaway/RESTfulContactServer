@@ -68,14 +68,15 @@ public class ContactsResource {
 			@HeaderParam("If-Match") String ifMatch,
 			@HeaderParam("If-None-Match") String ifNoneMatch,
 			@QueryParam("title") String title, @Context Request request) {
-		
+
 		Contact contact = dao.find(Long.parseLong(id));
+		if(contact==null)return Response.noContent().build();
 		Response response = checkMatch(ifMatch, ifNoneMatch,
 				Integer.toString(contact.hashCode()), true);
-		if(response!=null){
+		if (response != null) {
 			return response;
 		}
-		
+
 		CacheControl cc = new CacheControl();
 		cc.setMaxAge(-1);
 		cc.setPrivate(true);
@@ -99,32 +100,39 @@ public class ContactsResource {
 			@QueryParam("title") String title, @Context Request request,
 			@QueryParam("q") String q) {
 
-		// List<Contact> arr;
-		// GenericEntity<List<Contact>> out;
-		// if(q==null){
-		Contacts out = dao.findAll();
-		Response response = checkMatch(ifMatch, ifNoneMatch,
-				Integer.toString(out.hashCode()), true);
+		if (q == null) {
+			Contacts out = dao.findAll();
+			Response response = checkMatch(ifMatch, ifNoneMatch,
+					Integer.toString(out.hashCode()), true);
 
-		if (response != null) {
-			return response;
+			if (response != null) {
+				return response;
+			}
+			CacheControl cc = new CacheControl();
+			cc.setMaxAge(-1);
+			cc.setPrivate(true);
+			EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
+
+			return Response.ok(out).cacheControl(cc).tag(etag).build();
+		} else {
+			Contacts out = dao.getByQuery(q);
+
+			if (out != null) {
+				Response response = checkMatch(ifMatch, ifNoneMatch,
+						Integer.toString(out.hashCode()), true);
+
+				if (response != null) {
+					return response;
+				}
+				CacheControl cc = new CacheControl();
+				cc.setMaxAge(-1);
+				cc.setPrivate(true);
+				EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
+
+				return Response.ok(out).cacheControl(cc).tag(etag).build();
+			}
+			return Response.noContent().build();
 		}
-		CacheControl cc = new CacheControl();
-		cc.setMaxAge(-1);
-		cc.setPrivate(true);
-		EntityTag etag = new EntityTag(Integer.toString(out.hashCode()));
-
-		return Response.ok(out).cacheControl(cc).tag(etag).build();
-		// }
-		// else{
-		// arr = dao.getByQuery(q);
-		//
-		// if(arr!=null){
-		// out = new GenericEntity<List<Contact>>(arr) {};
-		// return Response.ok(out).build();
-		// }
-		// return Response.noContent().build();
-		// }
 
 	}
 
@@ -139,14 +147,28 @@ public class ContactsResource {
 	 */
 	@PUT
 	@Path("{id}")
-	@Consumes(MediaType.TEXT_XML)
-	public Response updateContact(JAXBElement<Contact> element,
-			@PathParam("id") String id) throws URISyntaxException {
+	@Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+	public Response updateContact(@HeaderParam("If-Match") String ifMatch,
+			@HeaderParam("If-None-Match") String ifNoneMatch,
+			JAXBElement<Contact> element, @PathParam("id") String id,
+			@Context UriInfo uriInfo) throws URISyntaxException {
 		Contact contact = element.getValue();
 		contact.setId(id);
+
+		Response response = checkMatch(ifMatch, ifNoneMatch,
+				Integer.toString(contact.hashCode()), false);
+		if (response != null) {
+			return response;
+		}
+
 		dao.update(contact);
-		return Response.created(new URI("localhost:8080/contacts/" + id))
-				.build();
+
+		CacheControl cc = new CacheControl();
+		cc.setMaxAge(-1);
+		EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
+
+		return Response.created(uriInfo.getAbsolutePath()).cacheControl(cc)
+				.tag(etag).build();
 	}
 
 	/**
@@ -156,19 +178,23 @@ public class ContactsResource {
 	 *            xml elements
 	 * @param uriInfo
 	 * @return
-	 * @throws URISyntaxException 
+	 * @throws URISyntaxException
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_XML })
-	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo,@Context Request request) throws URISyntaxException {
+	public Response post(JAXBElement<Contact> element,
+			@Context UriInfo uriInfo, @Context Request request)
+			throws URISyntaxException {
 		Contact contact = element.getValue();
+
 		if (dao.save(contact)) {
+
 			CacheControl cc = new CacheControl();
-			cc.setMaxAge( -1 );
-			EntityTag etag = new EntityTag( Integer.toString(contact.hashCode()));
+			cc.setMaxAge(-1);
+			EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
 			URI uri = new URI(uriInfo.getAbsolutePath() + contact.getId());
-			return Response.created(uri).cacheControl( cc ).tag( etag ).build();
+			return Response.created(uri).cacheControl(cc).tag(etag).build();
 		}
 		return Response.serverError().build();
 
@@ -183,9 +209,17 @@ public class ContactsResource {
 	@DELETE
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_XML)
-	public Response deleteContact(@PathParam("id") String id) {
-		if (dao.delete(Long.parseLong(id)))
-			return Response.ok().build();
+	public Response deleteContact(@HeaderParam("If-Match") String ifMatch,
+			@HeaderParam("If-None-Match") String ifNoneMatch,@PathParam("id") String id) {
+		Contact contact = dao.find(Long.parseLong(id));
+		if (contact != null) {
+			
+			Response response = checkMatch(ifMatch, ifNoneMatch,
+					Integer.toString(contact.hashCode()), false);
+			if(response!=null) return response;
+			if (dao.delete(Long.parseLong(id)))
+				return Response.ok().build();
+		}
 		return Response.notModified().build();
 	}
 

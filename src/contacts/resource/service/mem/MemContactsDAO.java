@@ -143,12 +143,15 @@ public class MemContactsDAO implements ContactDao {
 	 * @param s sub-Srting
 	 * @return
 	 */
-	public List<Contact> getByQuery(String s){
+	public Contacts getByQuery(String s){
 		List<Contact> out = new ArrayList<Contact>();
 //		String rex = ".*\\b"+s+"\\b.*";
 		for(int i =0;i<contacts.size();i++){
 			if(contacts.get(i).getTitle().contains(s)) out.add(contacts.get(i));
 		}
-		return out;
+		if(out.size()==0)return null;
+		Contacts contacts = new Contacts();
+		contacts.setContacts(out);
+		return contacts;
 	}
 }
