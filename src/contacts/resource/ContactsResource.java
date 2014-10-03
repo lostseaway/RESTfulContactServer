@@ -93,7 +93,7 @@ public class ContactsResource {
 	 * @return response with array of contacts
 	 */
 	@GET
-	@Produces("text/xml")
+	@Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 	public Response getContects(@HeaderParam("If-Match") String ifMatch,
 			@HeaderParam("If-None-Match") String ifNoneMatch,
 			@QueryParam("title") String title, @Context Request request,
@@ -156,15 +156,19 @@ public class ContactsResource {
 	 *            xml elements
 	 * @param uriInfo
 	 * @return
+	 * @throws URISyntaxException 
 	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_XML })
 	@Produces({ MediaType.APPLICATION_XML })
-	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo) {
+	public Response post(JAXBElement<Contact> element, @Context UriInfo uriInfo,@Context Request request) throws URISyntaxException {
 		Contact contact = element.getValue();
 		if (dao.save(contact)) {
-			URI uri = uriInfo.getAbsolutePath();
-			return Response.created(uri).build();
+			CacheControl cc = new CacheControl();
+			cc.setMaxAge( -1 );
+			EntityTag etag = new EntityTag( Integer.toString(contact.hashCode()));
+			URI uri = new URI(uriInfo.getAbsolutePath() + contact.getId());
+			return Response.created(uri).cacheControl( cc ).tag( etag ).build();
 		}
 		return Response.serverError().build();
 
