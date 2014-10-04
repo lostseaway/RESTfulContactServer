@@ -27,6 +27,11 @@ import org.junit.Test;
 import contacts.JettyMain;
 import contacts.resource.service.Contact;
 
+/**
+ * JUnit Test for Etag
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
+ */
 public class ETagTest {
 
 	Server server;
