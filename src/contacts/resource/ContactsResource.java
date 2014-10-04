@@ -154,9 +154,10 @@ public class ContactsResource {
 			@Context UriInfo uriInfo) throws URISyntaxException {
 		Contact contact = element.getValue();
 		contact.setId(id);
+		Contact nContact = dao.find(Long.parseLong(id));
 
 		Response response = checkMatch(ifMatch, ifNoneMatch,
-				Integer.toString(contact.hashCode()), false);
+				Integer.toString(nContact.hashCode()), false);
 		if (response != null) {
 			return response;
 		}
@@ -187,16 +188,17 @@ public class ContactsResource {
 			@Context UriInfo uriInfo, @Context Request request)
 			throws URISyntaxException {
 		Contact contact = element.getValue();
-
-		if (dao.save(contact)) {
-
+		Contact tmp = dao.find(Long.parseLong(contact.getId()));
+		
+		if (tmp==null) {
+			dao.save(contact);
 			CacheControl cc = new CacheControl();
 			cc.setMaxAge(-1);
 			EntityTag etag = new EntityTag(Integer.toString(contact.hashCode()));
 			URI uri = new URI(uriInfo.getAbsolutePath() + contact.getId());
 			return Response.created(uri).cacheControl(cc).tag(etag).build();
 		}
-		return Response.serverError().build();
+		return Response.status(409).build();
 
 	}
 
@@ -222,7 +224,15 @@ public class ContactsResource {
 		}
 		return Response.notModified().build();
 	}
-
+	
+	/**
+	 * Checking IF-Match / IF-NONE-Match from request
+	 * @param ifMatch
+	 * @param ifNoneMatch
+	 * @param etag
+	 * @param isGetMethod
+	 * @return response
+	 */
 	private Response checkMatch(String ifMatch, String ifNoneMatch,
 			String etag, boolean isGetMethod) {
 		System.out.println("IF-Match " + ifMatch + " , IF-None-Match "
