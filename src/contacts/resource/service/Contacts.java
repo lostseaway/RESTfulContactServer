@@ -10,11 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
- * This is the wrapper class that wrap a collection of Contact class.
- * for JAXB to be able to marshal it to xml text file.
- * 
- * @author mapfap - Sarun Wongtanakarn
- * 
+ * Contacts class for collect many Contact Class
+ * Edit from Sarun Contacts Class
+ * @author Thunyathon Jaruchotrattanasakul 55105469782
+ *
  */
 @XmlRootElement(name="contacts")
 @XmlAccessorType(XmlAccessType.FIELD)
