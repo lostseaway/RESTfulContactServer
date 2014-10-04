@@ -178,7 +178,7 @@ public class ETagTest {
 
 		request = client.newRequest(url + 999).header(HttpHeader.IF_NONE_MATCH, etag).method(HttpMethod.DELETE);
 		res = request.send();
-		assertEquals("DELETE not success 412 Precondition Failed",
-				Status.PRECONDITION_FAILED.getStatusCode(), res.getStatus());
+		assertEquals("Expect 200",
+				Status.OK.getStatusCode(), res.getStatus());
 	}
 }
