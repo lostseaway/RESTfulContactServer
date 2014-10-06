@@ -26,7 +26,7 @@ import contacts.JettyMain;
 import contacts.resource.service.Contact;
 
 /**
- * Junite Test For Contact DAO
+ * Junit Test For Contact DAO
  * @author Thunyathon Jaruchotrattanasakul 55105469782
  *
  */
@@ -41,12 +41,13 @@ public class ContactTest {
 	@Before
 	public void beforeTest() throws Exception{
 		//Start Jetty
+//Why start 2 servers?  
 		JettyMain.startServer(8080);
 		server = new Server(8080);
 		
 		//Setup Clients
 		client.start();
-		
+//Should not assume service is running on this URL. Get it from server.		
 		//Setup URL
 		url = "http://localhost:8080/contacts/";
 	}
@@ -258,6 +259,7 @@ public class ContactTest {
 	@Test
 	public void TestDelete2() throws InterruptedException, TimeoutException, ExecutionException{
 		ContentResponse r = client.newRequest(url+999).method(HttpMethod.DELETE).send();
+// Should be NOT_FOUND
 		assertEquals(Status.NOT_MODIFIED.getStatusCode(),r.getStatus());
 	}
 	

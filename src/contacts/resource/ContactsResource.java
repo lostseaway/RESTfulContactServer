@@ -65,6 +65,7 @@ public class ContactsResource {
 	 */
 	@GET
 	@Produces("text/xml")
+// query parameter name was changed to "title"
 	public Response getContects(@QueryParam("q") String q) {
 		List<Contact> arr;
 		GenericEntity<List<Contact>> out;
@@ -79,6 +80,7 @@ public class ContactsResource {
 				out = new GenericEntity<List<Contact>>(arr) {};
 				return Response.ok(out).build();
 			}
+// Should return NOT FOUND
 			return Response.noContent().build();
 		}
 			
@@ -99,6 +101,8 @@ public class ContactsResource {
 		Contact contact = element.getValue();
 		contact.setId(id);
 		dao.update(contact);
+// Should return OK unless creating a new contact.
+// BAD CODE. Don't assume the application URL. Get it from uriInfo
 		return Response.created(new URI("localhost:8080/contacts/"+id)).build();
 	}
 	
@@ -117,6 +121,9 @@ public class ContactsResource {
 	            	URI uri = uriInfo.getAbsolutePath();
 	            	return Response.created(uri).build();	
 	            }
+// Not necessarily.
+// save() could be false if the contact (request body) contained an id
+// of an existing contact. Return CONFLICT.	            
 	            return Response.serverError().build();
 	            
 	            
@@ -131,6 +138,7 @@ public class ContactsResource {
 	@Produces( MediaType.APPLICATION_XML )
 	public Response deleteContact( @PathParam("id") String id) {
 		if(dao.delete(Long.parseLong(id)))return Response.ok().build();
+// Might be NOT FOUND in case id not in persistence.
 		return Response.notModified().build();
 	}
 	

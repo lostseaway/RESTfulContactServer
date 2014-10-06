@@ -18,6 +18,8 @@ import contacts.resource.service.ContactDao;
  */
 public class JpaContactsDao implements ContactDao {
 	private final EntityManager em;
+// This class isn't an entity so JAX isn't going to inject anything.
+// The @Context is useless here.  uriInfo doesn't seem to be used, either.
 	@Context
 	UriInfo uriInfo;
 	public JpaContactsDao(EntityManager em) {
@@ -47,6 +49,7 @@ public class JpaContactsDao implements ContactDao {
 
 	@Override
 	public boolean save(Contact contact) {
+// Must use try catch and rollback
 		if (contact == null) throw new IllegalArgumentException("NULL contact");
 		Contact con = em.find(Contact.class,contact.getId());
 		if(con!=null)return false;
@@ -59,6 +62,7 @@ public class JpaContactsDao implements ContactDao {
 
 	@Override
 	public boolean update(Contact update) {
+// Must use try catch and rollback
 		EntityTransaction et = em.getTransaction();
 		et.begin();
 		Contact contact = em.find(Contact.class, update.getId());
@@ -66,7 +70,8 @@ public class JpaContactsDao implements ContactDao {
 			et.commit();
 			return false;
 		}
-		
+// Don't set attributes of contact. Too much coupling.
+// Just use em.merge( update )
 		if(update.getName()!=null) contact.setName(update.getName());
 		if(update.getEmail()!=null) contact.setEmail(update.getEmail());
 		if(update.getPhoneNumber()!=null) contact.setPhoneNumber(update.getPhoneNumber());
